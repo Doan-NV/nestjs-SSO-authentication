@@ -1,0 +1,43 @@
+version: "3.8"
+services:
+  user_ms:
+    env_file:
+      - .env.prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: yarn start
+    ports:
+      - "${SERVER_PORT}:3000"
+    volumes:
+      - .env:/.env
+      - ./src:/src
+      - ./package.json:/package.json
+      - ./yarn.lock:/yarn.lock
+    depends_on:
+      - redis_server
+    networks:
+      - kiso_network
+      
+  redis_server: 
+    image: 'redis'
+    env_file:
+      - .env.prod
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_URL=redis
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - './volumes/redis/db:/bitnami/redis/data'
+    networks:
+      - kiso_network
+
+volumes:
+  mysql_volume:
+    name: mysql-production-volume
+
+networks:
+  kiso_network:
+    external: true

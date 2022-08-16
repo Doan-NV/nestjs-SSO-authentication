@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "${MONGO_PORT}:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=api-rewarding
+    volumes:
+      - ./volumes/mongodb:/data/db
+    networks:
+      - mongo_net
+  
+  redis-server: 
+    image: 'redis'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_URL=redis
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - './volumes/redis/db:/bitnami/redis/data'
+    networks:
+      - mongo_net
+
+networks:
+  mongo_net:
+    driver: bridge
